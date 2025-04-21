@@ -1,20 +1,3 @@
-' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
-'
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-'
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-'
-' You should have received a copy of the GNU General Public License
-' along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-' Preview durch <Alt>d
-
 @startuml Controller-Klasse
 
 interface Promise<T>
@@ -49,43 +32,41 @@ package express {
   Response .[hidden].> Controller
 }
 
-package buch {
+package auto {
   package entity #FFFFFF {
-    class Buch <<entity>>
-
-    Buch .[hidden].> Promise
-    Buch .[hidden].> Request
+    class Auto <<entity>>
   }
 
   package service {
-    class BuchReadService << control >>
+    class AutoReadService << control >>
   }
 
   package rest #DDDDDD {
-    BuchQuery -up-|> Buch
+    class AutoQuery
 
-    class BuchGetController << control >> << @Controller() >> << @UseInterceptors() >> {
-      + @Get() async getId(@Param() id: number, @Req() req: Request, @Headers() version: string, @Res() res: Response): Promise<Response<BuchModel | undefined>>
-      + @Get() async get(@Query() query: BuchQuery, @Req() req: Request,  @Res() res: Response): Promise<Response<BuecherModel | undefined>>
+    class AutoGetController <<control>> <<@Controller()>> <<@UseInterceptors()>> {
+      + @Get(':id') async getById(id: number, req: Request, version: string, res: Response): Promise<Response<Auto | undefined>>
+      + @Get() async get(query: AutoQuery, req: Request, res: Response): Promise<Response<Auto[] | undefined>>
+      + @Get('/file/:id') async getFileById(id: number, res: Response): Promise<StreamableFile>
     }
 
-    BuchGetController o--> "1" BuchReadService : service
+    AutoGetController o--> "1" AutoReadService : service
 
-    BuchGetController ..> Controller
-    BuchGetController ..> Request
-    BuchGetController ..> Response
-    BuchGetController ..> Promise
-    BuchGetController .up.> BuchModel
-    BuchGetController .up.> BuchQuery
+    AutoGetController ..> Controller
+    AutoGetController ..> Request
+    AutoGetController ..> Response
+    AutoGetController ..> Promise
+    AutoGetController .up.> Auto
+    AutoGetController .up.> AutoQuery
 
-    BuchReadService .[hidden].> Request
-    BuchReadService .[hidden].> Promise
+    AutoReadService .[hidden].> Request
+    AutoReadService .[hidden].> Promise
     Response .right[hidden].> Controller
   }
 }
 
 hide empty members
 
-footer (c) Juergen Zimmermann
+footer (c) Jürgen Zimmermann
 
 @enduml

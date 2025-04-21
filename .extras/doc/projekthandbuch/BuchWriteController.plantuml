@@ -1,20 +1,3 @@
-' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
-'
-' This program is free software: you can redistribute it and/or modify
-' it under the terms of the GNU General Public License as published by
-' the Free Software Foundation, either version 3 of the License, or
-' (at your option) any later version.
-'
-' This program is distributed in the hope that it will be useful,
-' but WITHOUT ANY WARRANTY; without even the implied warranty of
-' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-' GNU General Public License for more details.
-'
-' You should have received a copy of the GNU General Public License
-' along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-' Preview durch <Alt>d
-
 @startuml Controller-Klasse
 
 interface Promise<T>
@@ -78,47 +61,50 @@ package express {
   Response .right[hidden].> Controller
 }
 
-package buch {
+package auto {
   package entity #FFFFFF {
-    class Buch <<entity>>
+    class Auto <<entity>>
+    class Motor <<entity>>
+    class Reperatur <<entity>>
 
-    Buch .[hidden].> Promise
-    Buch .[hidden].> Request
+    Auto .[hidden].> Promise
+    Auto .[hidden].> Request
   }
 
   package service {
-    class BuchWriteService << control >>
-    class BuchReadService << control >>
+    class AutoWriteService << control >>
   }
 
   package rest #DDDDDD {
-    class BuchWriteController << control >> << @Controller() >> << @UseGuards() >> << @UseInterceptors() >> {
-      + @Post() @Roles() async post(@Body() buch: Buch, @Req() req: Request,  @Res() res: Response): Promise<Response>
-      + @Put() @Roles() async put(@Body() buch: Buch, @Param() id: number, @Headers() version: string, @Res() res: Response): Promise<Response>
-      + @Delete() @Roles() async delete(@Param() id: number, @Res() res: Response): Promise<Response>
+    class AutoWriteController << control >> << @Controller() >> << @UseGuards() >> << @UseInterceptors() >> {
+      + @Post() @Roles() async post(@Body() auto: Auto, @Req() req: Request,  @Res() res: Response): Promise<Response>
+      + @Post(':id') @Public() async addFile(@Param() id: number, @UploadedFile() file, @Req() req, @Res() res): Promise<Response>
+      + @Put(':id') @Roles() async put(@Body() auto, @Param() id: number, @Headers() version: string, @Res() res: Response): Promise<Response>
+      + @Delete(':id') @Roles() async delete(@Param() id: number): Promise<void>
     }
 
-    BuchWriteController o--> "1" BuchWriteService : service
-    BuchWriteController o--> "1" BuchReadService : readService
-    BuchWriteController ..up> Buch
+    AutoWriteController o--> "1" AutoWriteService : service
+    AutoWriteController ..up> Auto
+    AutoWriteController ..> Motor
+    AutoWriteController ..> Reperatur
 
-    BuchWriteController ..> Controller
+    AutoWriteController ..> Controller
 
-    BuchWriteController .up.> AuthGuard
-    BuchWriteController .up.> Roles
+    AutoWriteController .up.> AuthGuard
+    AutoWriteController .up.> Roles
 
-    BuchWriteController ..> Request
-    BuchWriteController ..> Response
-    BuchWriteController ..> Promise
+    AutoWriteController ..> Request
+    AutoWriteController ..> Response
+    AutoWriteController ..> Promise
 
-    Buch .up[hidden].> Roles
-    BuchWriteService .[hidden].> Request
-    BuchWriteService .[hidden].> Promise
+    Auto .up[hidden].> Roles
+    AutoWriteService .[hidden].> Request
+    AutoWriteService .[hidden].> Promise
   }
 }
 
 hide empty members
 
-footer (c) Juergen Zimmermann
+footer (c) Jürgen Zimmermann
 
 @enduml
